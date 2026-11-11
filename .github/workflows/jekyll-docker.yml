@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daraz Auto Share PRO</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101827;color:white;font-family:Arial,sans-serif}
+header{background:#ed4b24;padding:24px;text-align:center}
+header h1{margin:0;font-size:26px}
+main{max-width:700px;margin:22px auto;padding:12px}
+.card{background:#1e293b;padding:20px;border-radius:16px;margin-bottom:17px}
+h2{font-size:18px}
+label{display:block;margin:14px 0 7px;color:#cbd5e1}
+input,textarea,select{width:100%;padding:14px;border:1px solid #475569;border-radius:9px;background:#0f172a;color:white;font-size:15px}
+textarea{height:130px}
+button{padding:15px;border:0;border-radius:10px;font-weight:bold;font-size:15px;cursor:pointer}
+.primary{background:#ff5429;color:white;width:100%;margin-top:15px}
+.secondary{background:#334155;color:white;width:100%;margin-top:10px}
+#posts{overflow-wrap:anywhere}
+.post{background:#0f172a;padding:14px;border-radius:12px;margin:12px 0;white-space:pre-wrap}
+small{color:#aab6c8}
+</style>
+</head>
+<body>
+<header>
+<h1>🛍️ DARAZ AUTO SHARE PRO</h1>
+<p>One Dashboard • Multiple Links • Easy Sharing</p>
+</header>
+<main>
+<div class="card">
+<h2>👤 Facebook Account</h2>
+<select id="account">
+<option>Facebook Account 1</option>
+<option>Facebook Account 2</option>
+</select>
+<label>Posting Destination</label>
+<select id="destination">
+<option>Personal Profile</option>
+<option>Facebook Group</option>
+</select>
+<label>Group URL (optional)</label>
+<input id="group" placeholder="Facebook Group URL">
+</div>
+
+<div class="card">
+<h2>🔗 Daraz Affiliate Links</h2>
+<textarea id="links" placeholder="Paste multiple Daraz links, one per line"></textarea>
+<p id="count">0 Links Added</p>
+</div>
+
+<div class="card">
+<h2>✍️ Post Caption</h2>
+<textarea id="caption">🔥 زبردست آفر! ابھی آرڈر کریں۔</textarea>
+<label>Posting Style</label>
+<select id="mode">
+<option value="separate">Separate post for each link</option>
+<option value="all">All links in one post</option>
+</select>
+<button class="primary" onclick="prepare()">🚀 PREPARE ALL POSTS</button>
+</div>
+
+<div class="card" id="output" hidden>
+<h2>📋 Ready Posts</h2>
+<div id="posts"></div>
+<button class="primary" onclick="openFacebook()">OPEN FACEBOOK</button>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function getLinks(){
+return $('links').value.split(/\s+/)
+.map(x=>x.trim())
+.filter(x=>/^https?:\/\/\S+$/i.test(x));
+}
+$('links').addEventListener('input',()=>{
+$('count').textContent=getLinks().length+' Valid Links Added';
+});
+function prepare(){
+let links=getLinks();
+if(!links.length){alert('Please add Daraz links');return}
+let caption=$('caption').value.trim();
+if(!caption){alert('Please enter a caption');return}
+let groups=$('mode').value==='all'?[links]:links.map(x=>[x]);
+$('posts').innerHTML='';
+groups.forEach((g,i)=>{
+let content=caption+'\n\n'+g.join('\n\n');
+let box=document.createElement('div');
+box.className='post';
+let heading=document.createElement('b');
+heading.textContent='POST '+(i+1);
+let preview=document.createElement('p');
+preview.textContent=content;
+let copy=document.createElement('button');
+copy.className='secondary';
+copy.textContent='📋 COPY POST';
+copy.onclick=async()=>{
+try{await navigator.clipboard.writeText(content);copy.textContent='COPIED ✓'}
+catch(e){alert('Please select and copy the post manually')}
+};
+box.append(heading,preview,copy);
+$('posts').append(box);
+});
+$('output').hidden=false;
+$('output').scrollIntoView({behavior:'smooth'});
+}
+function openFacebook(){
+let destination=$('destination').value;
+let group=$('group').value.trim();
+if(destination==='Facebook Group'&&/^https:\/\/www\.facebook\.com\//i.test(group)){
+window.open(group,'_blank');
+}else{
+window.open('https://www.facebook.com/','_blank');
+}
+}
+</script>
+</body>
+</html>
