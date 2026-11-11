@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daraz Auto Share PRO</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f5f8;font-family:Arial,sans-serif;color:#252525}
+header{background:#f4511e;color:white;padding:22px 18px}
+header h1{margin:0;font-size:24px}
+header p{margin:7px 0 0;font-size:13px}
+main{max-width:650px;margin:20px auto;padding:12px}
+.card{background:white;padding:20px;border-radius:16px;margin-bottom:15px;box-shadow:0 3px 15px #0000000b}
+h2{font-size:17px;margin:0 0 15px}
+label{display:block;font-size:13px;font-weight:bold;margin:12px 0 7px}
+input,textarea,select{width:100%;padding:13px;border:1px solid #ddd;border-radius:9px;font-size:15px;background:white}
+textarea{min-height:125px;resize:vertical}
+button{border:0;border-radius:10px;padding:14px;font-size:15px;font-weight:bold;cursor:pointer}
+.primary{background:#f4511e;color:white;width:100%;margin-top:12px}
+.secondary{background:#eee;color:#333;width:100%;margin-top:8px}
+.post{border:1px solid #eee;border-radius:12px;padding:14px;margin-top:12px;overflow-wrap:anywhere}
+.post button{width:100%;margin-top:10px}
+.muted{color:#777;font-size:12px;line-height:1.6}
+.count{background:#fff1e9;padding:12px;border-radius:9px;color:#d94315;font-weight:bold}
+footer{text-align:center;color:#888;font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+<header>
+<h1>🛍️ DARAZ AUTO SHARE PRO</h1>
+<p>Bulk Affiliate Post Manager</p>
+</header>
+<main>
+<div class="card">
+<h2>① Facebook Account منتخب کریں</h2>
+<label>اکاؤنٹ</label>
+<select id="account">
+<option>Facebook Account 1</option>
+<option>Facebook Account 2</option>
+</select>
+<label>کہاں شیئر کرنا ہے؟</label>
+<select id="destination">
+<option>Personal Profile</option>
+<option>Facebook Group</option>
+</select>
+<label>Facebook Group Link (اگر Group منتخب کیا ہو)</label>
+<input id="group" placeholder="https://facebook.com/groups/...">
+<p class="muted">اکاؤنٹ کا انتخاب صرف پوسٹ مینجمنٹ کے لیے ہے۔ ذاتی پروفائل اور Groups میں دستی Share کرنا ہوگا۔</p>
+</div>
+
+<div class="card">
+<h2>② Daraz Affiliate Links شامل کریں</h2>
+<textarea id="links" placeholder="ہر لائن میں ایک Daraz Affiliate Link ڈالیں&#10;https://s.daraz.pk/...&#10;https://s.daraz.pk/..."></textarea>
+<div class="count" id="count">0 Links Added</div>
+</div>
+
+<div class="card">
+<h2>③ پوسٹ کا Caption</h2>
+<textarea id="caption">🔥 زبردست آفر! ابھی آرڈر کریں۔</textarea>
+<label>پوسٹنگ کا طریقہ</label>
+<select id="mode">
+<option value="separate">ہر لنک کی الگ پوسٹ</option>
+<option value="single">تمام لنکس ایک پوسٹ میں</option>
+</select>
+<button class="primary" onclick="prepare()">🚀 PREPARE ALL POSTS</button>
+</div>
+
+<div class="card" id="results" style="display:none">
+<h2>④ آپ کی تیار پوسٹس</h2>
+<div id="posts"></div>
+</div>
+
+<div class="card">
+<h2>Facebook پر شیئر کریں</h2>
+<button class="secondary" onclick="openFacebook()">🌐 Open Facebook</button>
+<p class="muted">ہر پوسٹ کا Copy بٹن دبائیں، Facebook کھولیں اور اپنی منتخب جگہ پر خود Share کریں۔</p>
+</div>
+</main>
+<footer>Daraz Auto Share PRO · Version 1.0</footer>
+
+<script>
+const links=document.getElementById('links');
+links.addEventListener('input',()=>{
+ const valid=links.value.split(/\s+/).filter(x=>/^https?:\/\/\S+$/i.test(x));
+ document.getElementById('count').textContent=valid.length+' Valid Links Added';
+});
+
+function prepare(){
+ const urls=links.value.split(/\s+/)
+ .map(x=>x.trim())
+ .filter(x=>/^https?:\/\/\S+$/i.test(x));
+ const caption=document.getElementById('caption').value.trim();
+ const mode=document.getElementById('mode').value;
+ if(!urls.length){alert('پہلے Daraz Affiliate Links ڈالیں');return}
+ if(!caption){alert('Caption لکھیں');return}
+
+ const groups=mode==='single'?[urls]:urls.map(x=>[x]);
+ const container=document.getElementById('posts');
+ container.innerHTML='';
+ document.getElementById('results').style.display='block';
+
+ groups.forEach((group,i)=>{
+  const content=caption+'\n\n'+group.join('\n\n');
+  const box=document.createElement('div');
+  box.className='post';
+  const title=document.createElement('b');
+  title.textContent='Post '+(i+1);
+  const preview=document.createElement('p');
+  preview.style.whiteSpace='pre-wrap';
+  preview.textContent=content;
+  const copy=document.createElement('button');
+  copy.className='secondary';
+  copy.textContent='📋 Copy Post';
+  copy.onclick=async()=>{
+   try{
+    await navigator.clipboard.writeText(content);
+    copy.textContent='✓ Copied!';
+   }catch(e){
+    alert('Copy نہیں ہوا۔ پوسٹ کو منتخب کرکے Copy کریں۔');
+   }
+  };
+  box.append(title,preview,copy);
+  container.appendChild(box);
+ });
+ document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+function openFacebook(){
+ const dest=document.getElementById('destination').value;
+ const group=document.getElementById('group').value.trim();
+ if(dest==='Facebook Group' && group.startsWith('https://')){
+  window.open(group,'_blank');
+ }else{
+  window.open('https://www.facebook.com/','_blank');
+ }
+}
+</script>
+</body>
+</html>
